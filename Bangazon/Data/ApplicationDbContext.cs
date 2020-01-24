@@ -183,7 +183,18 @@ namespace Bangazon.Data {
                     Title = "Hammer",
                     Quantity = 32,
                     Price = 22.69
+                },
+                new Product()
+                {
+                    ProductId = 6,
+                    ProductTypeId = 10,
+                    UserId = user.Id,
+                    Description = "It makes cars stable.",
+                    Title = "Tire",
+                    Quantity = 342,
+                    Price = 756.23
                 }
+
             );
 
             modelBuilder.Entity<Order> ().HasData (
