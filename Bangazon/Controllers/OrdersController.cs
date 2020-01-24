@@ -42,6 +42,7 @@ namespace Bangazon.Controllers
                 .Include(o => o.User)
                 .Include(o => o.OrderProducts).ThenInclude(o => o.Product)
                 .FirstOrDefaultAsync(m => m.UserId == user.Id && m.DateCompleted == null);
+                
 
             if (order == null)
             {
@@ -49,6 +50,24 @@ namespace Bangazon.Controllers
             }
 
             return View(order);
+        }
+
+        // PUT: Orders/Checkout
+        public async Task<IActionResult> Checkout()
+        {
+
+            var user = await GetCurrentUserAsync();
+
+            var payments = _context.PaymentType
+                .Where(o => o.UserId == user.Id);
+                
+
+            if (payments == null)
+            {
+                return NotFound();
+            }
+            //Continue later
+            return View(payments);
         }
 
         // GET: Orders/Create
