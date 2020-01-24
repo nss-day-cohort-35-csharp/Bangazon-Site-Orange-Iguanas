@@ -27,7 +27,7 @@ namespace Bangazon.Controllers
             
             if (!string.IsNullOrWhiteSpace(searchString))
             {
-                products = products.Where( );
+                products = products.Where(p => p.Title.ToLower().Contains(searchString.ToLower())).ToList();
             }
             return View(products);
         }
