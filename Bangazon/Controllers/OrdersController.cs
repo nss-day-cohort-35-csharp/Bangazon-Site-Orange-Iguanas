@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Bangazon.Data;
+﻿using Bangazon.Data;
 using Bangazon.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Bangazon.Controllers
 {
@@ -34,7 +33,6 @@ namespace Bangazon.Controllers
         // GET: Orders/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-
             var user = await GetCurrentUserAsync();
 
             var order = await _context.Order
@@ -42,7 +40,6 @@ namespace Bangazon.Controllers
                 .Include(o => o.User)
                 .Include(o => o.OrderProducts).ThenInclude(o => o.Product)
                 .FirstOrDefaultAsync(m => m.UserId == user.Id && m.DateCompleted == null);
-                
 
             if (order == null)
             {
@@ -52,22 +49,24 @@ namespace Bangazon.Controllers
             return View(order);
         }
 
-        // PUT: Orders/Checkout
-        public async Task<IActionResult> Checkout()
+        // : Orders/Edit
+        public async Task<IActionResult> Edit(int? id)
         {
-
             var user = await GetCurrentUserAsync();
 
-            var payments = _context.PaymentType
-                .Where(o => o.UserId == user.Id);
-                
+            var order = await _context.Order
+            .Include(o => o.OrderProducts).ThenInclude(o => o.Product)
+            .FirstOrDefaultAsync(m => m.UserId == user.Id && m.DateCompleted == null);
 
-            if (payments == null)
-            {
-                return NotFound();
-            }
+            var userPayments = await _context.ApplicationUsers
+                .Include(o => o.PaymentTypes)
+                .FirstOrDefaultAsync(o => o.Id == user.Id);
+
+            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", order.UserId);
+            ViewData["PaymentTypes"] = new SelectList(userPayments.PaymentTypes, "PaymentTypeId", "Description", order.PaymentTypeId);
+
             //Continue later
-            return View(payments);
+            return View(order);
         }
 
         // GET: Orders/Create
@@ -79,7 +78,7 @@ namespace Bangazon.Controllers
         }
 
         // POST: Orders/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -96,40 +95,24 @@ namespace Bangazon.Controllers
             return View(order);
         }
 
-        // GET: Orders/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var order = await _context.Order.FindAsync(id);
-            if (order == null)
-            {
-                return NotFound();
-            }
-            ViewData["PaymentTypeId"] = new SelectList(_context.PaymentType, "PaymentTypeId", "AccountNumber", order.PaymentTypeId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", order.UserId);
-            return View(order);
-        }
 
         // POST: Orders/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("OrderId,DateCreated,DateCompleted,UserId,PaymentTypeId")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("OrderId,DateCompleted,PaymentTypeId")] Order order)
         {
-            if (id != order.OrderId)
-            {
-                return NotFound();
-            }
+            ModelState.Remove("UserId");
+            ModelState.Remove("User");
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var user = await GetCurrentUserAsync();
+                    order.DateCompleted = DateTime.Today;
+                    order.UserId = user.Id;
                     _context.Update(order);
                     await _context.SaveChangesAsync();
                 }
@@ -144,11 +127,16 @@ namespace Bangazon.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Confirmed));
             }
             ViewData["PaymentTypeId"] = new SelectList(_context.PaymentType, "PaymentTypeId", "AccountNumber", order.PaymentTypeId);
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", order.UserId);
             return View(order);
+        }
+
+        public IActionResult Confirmed()
+        {
+            return View();
         }
 
         // GET: Orders/Delete/5
