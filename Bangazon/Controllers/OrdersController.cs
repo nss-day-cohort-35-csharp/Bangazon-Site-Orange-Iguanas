@@ -43,7 +43,13 @@ namespace Bangazon.Controllers
 
             if (order == null)
             {
-                return NotFound();
+                _context.Add(new Order()
+                {
+                    DateCreated = DateTime.Today,
+                    UserId = user.Id
+                });
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Details));
             }
 
             return View(order);
