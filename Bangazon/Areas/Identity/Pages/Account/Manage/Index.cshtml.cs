@@ -25,6 +25,11 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
 
         public string Username { get; set; }
 
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public string Address { get; set; }
+
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -36,6 +41,7 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -44,6 +50,12 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
+
+            FirstName = user.FirstName;
+
+            LastName = user.LastName;
+
+            Address = user.StreetAddress;
 
             Input = new InputModel
             {
