@@ -26,7 +26,7 @@ namespace Bangazon.Models
 
         [Required]
         [DisplayFormat(DataFormatString = "{0:C}")]
-        [Range(1, 10001, ErrorMessage = "Price must be 10,000 or less ")]
+        [Range(1, 10001.00, ErrorMessage = "Price must be 10,000 or less ")]
         public double Price { get; set; }
 
         [Required(ErrorMessage = "Please Select a Product Category")]
