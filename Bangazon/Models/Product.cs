@@ -26,9 +26,10 @@ namespace Bangazon.Models
 
         [Required]
         [DisplayFormat(DataFormatString = "{0:C}")]
+        [Range(1, 10001, ErrorMessage = "Price must be 10,000 or less ")]
         public double Price { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Please Select a Product Category")]
         public int Quantity { get; set; }
 
         [Required]
@@ -37,16 +38,17 @@ namespace Bangazon.Models
         public string City {get; set;}
 
         public string ImagePath {get; set;}
-
+            
         public bool Active { get; set; }
 
         [Required]
         public ApplicationUser User { get; set; }
 
-        [Required]
         [Display(Name="Product Category")]
+        [Required (ErrorMessage="Please Select a Product Category")]
         public int ProductTypeId { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Please Select a Product Category")]
         public ProductType ProductType { get; set; }
 
         public virtual ICollection<OrderProduct> OrderProducts { get; set; }
