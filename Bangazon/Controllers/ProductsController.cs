@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Identity;
+using Bangazon.Models.ProductViewModels;
 
 namespace Bangazon.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public ProductsController(ApplicationDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public ProductsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Products
@@ -25,9 +29,17 @@ namespace Bangazon.Controllers
             var products = await _context.Product.Include(p => p.ProductType).Include(u => u.User).Include(op => op.OrderProducts).ToListAsync();
             
             
+            //var user = await GetCurrentUserAsync();
+            // var products = await _context.Product.Include
+            //     (p => p.ProductType).Include(u => u.User).Where(p => p.Active == true).ToListAsync();
+
+
             if (!string.IsNullOrWhiteSpace(searchString))
             {
-                products = products.Where(p => p.Title.ToLower().Contains(searchString.ToLower())).ToList();
+
+                products = products.Where(p => p.Title.ToLower().Contains
+                (searchString.ToLower())).ToList();
+
             }
             return View(products);
         }
@@ -56,18 +68,26 @@ namespace Bangazon.Controllers
             var product = await _context.Product
                 .Include(p => p.ProductType)
                 .Include(p => p.User)
+                .Include(p => p.OrderProducts)
                 .FirstOrDefaultAsync(m => m.ProductId == id);
             if (product == null)
             {
                 return NotFound();
             }
+            var productDetail = new ProductDetailViewModel()
+            {
+                Product = product,
+                Inventory = product.Quantity - product.OrderProducts.Count()
 
-            return View(product);
+            };
+
+            return View(productDetail);
         }
 
         // GET: Products/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var user = await GetCurrentUserAsync();
             ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label");
            
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
@@ -79,8 +99,14 @@ namespace Bangazon.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,DateCreated,Description,Title,Price,Quantity,UserId,City,ImagePath,Active,ProductTypeId")] Product product)
+        public async Task<IActionResult> Create([Bind("ProductId,UserId,DateCreated,Description,Title,Price,Quantity,City,ImagePath,Active,ProductTypeId")] Product product)
         {
+            ModelState.Remove("User");
+            ModelState.Remove("ProductType");
+
+            //var user = await GetCurrentUserAsync();
+
+
             if (ModelState.IsValid)
             {
                 _context.Add(product);
@@ -89,6 +115,7 @@ namespace Bangazon.Controllers
             }
             ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label", product.ProductTypeId);
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", product.UserId);
+
             return View(product);
         }
 
@@ -164,6 +191,8 @@ namespace Bangazon.Controllers
                 return NotFound();
             }
 
+           
+
             return View(product);
         }
 
@@ -177,10 +206,22 @@ namespace Bangazon.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
+            
         private bool ProductExists(int id)
         {
             return _context.Product.Any(e => e.ProductId == id);
         }
+        public async Task<IActionResult> ViewInactiveProducts()
+        {
+            var products = await _context.Product.Include
+                (p => p.ProductType).Include(u => u.User)
+                .Where
+                (p => p.Active == false).ToListAsync();
+            return View(products);
+        }
+
+
+
+        private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
     }
 }
