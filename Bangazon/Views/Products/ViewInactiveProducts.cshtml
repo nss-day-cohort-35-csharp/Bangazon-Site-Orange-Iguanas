@@ -1,27 +1,14 @@
 ﻿@model IEnumerable<Bangazon.Models.Product>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "ViewInactiveProducts";
 }
 
-<h1>Index</h1>
+<h1>ViewInactiveProducts</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<p>
-    <a asp-action="ViewInactiveProducts">View Products Out of Stock</a>
-</p>
-<div class="card alert alert-primary">
-    <div class="card-body">
-        <form asp-controller="Products" asp-action="Index">
-
-            <div class="col"><input type="text" name="searchString" class="form-control" placeholder="Search.."></div>
-          
-        </form>
-
-    </div>
-</div>
 <table class="table">
     <thead>
         <tr>
