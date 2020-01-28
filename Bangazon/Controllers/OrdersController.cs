@@ -145,6 +145,7 @@ namespace Bangazon.Controllers
             return View();
         }
 
+        
         // GET: Orders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -164,17 +165,31 @@ namespace Bangazon.Controllers
 
             return View(order);
         }
+        
 
         // POST: Orders/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var order = await _context.Order.FindAsync(id);
-            _context.Order.Remove(order);
+            var orderProduct = await _context.OrderProduct.FindAsync(id);
+            _context.OrderProduct.Remove(orderProduct);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Details));
         }
+
+        /*
+        // POST: Orders/DeleteItem/5
+        [HttpPost, ActionName("DeleteItem")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteItem(int id, OrderProduct model)
+        {
+
+            _context.OrderProduct.Remove();
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Details));
+        }
+        */
 
         private bool OrderExists(int id)
         {
