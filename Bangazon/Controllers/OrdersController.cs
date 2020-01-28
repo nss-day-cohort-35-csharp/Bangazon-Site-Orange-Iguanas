@@ -178,18 +178,28 @@ namespace Bangazon.Controllers
             return RedirectToAction(nameof(Details));
         }
 
-        /*
-        // POST: Orders/DeleteItem/5
-        [HttpPost, ActionName("DeleteItem")]
+       
+        // POST: Orders/DeleteCart/
+        [HttpPost, ActionName("DeleteCart")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteItem(int id, OrderProduct model)
+        public async Task<IActionResult> DeleteCart(int OrderId)
         {
+            var order = await _context.Order
+            .Include(o => o.OrderProducts)
+            .FirstOrDefaultAsync(m => m.OrderId == OrderId);
 
-            _context.OrderProduct.Remove();
+            foreach(OrderProduct op in order.OrderProducts)
+            {
+                var orderProd = await _context.OrderProduct.FindAsync(op.OrderProductId);
+                _context.OrderProduct.Remove(orderProd);
+            }
+
+            var orderInstance = await _context.Order.FindAsync(OrderId);
+            _context.Order.Remove(orderInstance);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Details));
+            return Redirect("~/");
+
         }
-        */
 
         private bool OrderExists(int id)
         {
