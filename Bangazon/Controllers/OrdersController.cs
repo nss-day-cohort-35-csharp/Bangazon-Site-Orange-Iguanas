@@ -145,7 +145,7 @@ namespace Bangazon.Controllers
             return View();
         }
 
-        /*
+        
         // GET: Orders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -165,7 +165,7 @@ namespace Bangazon.Controllers
 
             return View(order);
         }
-        */
+        
 
         // POST: Orders/Delete/5
         [HttpPost, ActionName("Delete")]

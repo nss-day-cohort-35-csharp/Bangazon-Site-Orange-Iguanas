@@ -37,7 +37,9 @@
             </td>
            
             <td>
-                    <a asp-action="Delete" asp-route-id="@item.OrderProductId">Delete</a>
+                <form asp-action="Delete" asp-route-id =@item.OrderProductId>
+                    <input type="submit" value="Delete" class="btn btn-danger" />
+                </form>
             </td>
         </tr>
         }
