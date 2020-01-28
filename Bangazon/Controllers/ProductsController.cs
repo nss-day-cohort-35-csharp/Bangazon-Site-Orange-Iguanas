@@ -22,12 +22,25 @@ namespace Bangazon.Controllers
         // GET: Products
         public async Task<IActionResult> Index(string searchString)
         {
-            var products = await _context.Product.ToListAsync();
+            var products = await _context.Product.Include(p => p.ProductType).Include(u => u.User).Include(op => op.OrderProducts).ToListAsync();
             
             
             if (!string.IsNullOrWhiteSpace(searchString))
             {
                 products = products.Where(p => p.Title.ToLower().Contains(searchString.ToLower())).ToList();
+            }
+            return View(products);
+        }
+
+        // GET: ProductsByLocation
+        public async Task<IActionResult> Location(string searchString)
+        {
+            var products = await _context.Product.Include(p => p.ProductType).Include(u => u.User).ToListAsync();
+
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                products = products.Where(p => p.City != null && p.City.ToLower().Contains(searchString.ToLower())).ToList();
             }
             return View(products);
         }
@@ -56,6 +69,7 @@ namespace Bangazon.Controllers
         public IActionResult Create()
         {
             ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label");
+           
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
             return View();
         }

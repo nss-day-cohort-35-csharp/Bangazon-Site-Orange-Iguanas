@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Bangazon.Models.ProductTypeViewModel.ProductTypeWithProductCountViewModel>
+
+    <div>
+        <h4>Product Type</h4>
+        <hr />
+        <ul>
+            @foreach (var item in Model)
+            {
+                <li class="col-sm-12">
+                    @Html.DisplayFor(modelItem => item.TypeName) -
+
+                    @Html.DisplayFor(modelItem => item.ProductCount)
+                </li>
+                <ul>
+                    @foreach (var product in item.Products)
+                    {
+                    <li> @Html.DisplayFor(modelItem => product.Title)</li>
+                    }
+                </ul>
+
+            }
+        </ul>
+
+        </div>

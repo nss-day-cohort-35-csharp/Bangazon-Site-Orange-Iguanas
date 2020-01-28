@@ -54,6 +54,7 @@ namespace Bangazon.Models
         public Product ()
         {
             Active = true;
+           
         }
 
     }

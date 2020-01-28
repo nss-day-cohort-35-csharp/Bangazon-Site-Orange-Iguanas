@@ -1,0 +1,14 @@
+﻿@model IEnumerable<Bangazon.Models.ProductType>
+
+<li class="nav-item dropdown">
+
+    <a class="nav-link text-dark dropdown-toggle" data-toggle="dropdown" asp-area="" asp-controller="ProductTypes" asp-action="Index">Product Types</a>
+    <ul class="dropdown-menu">
+        @foreach (var item in Model)
+        {
+
+            <li><a href="">@Html.DisplayFor(modelItem => item.Label)</a></li>
+
+        }
+    </ul>
+</li>
