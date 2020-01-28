@@ -47,6 +47,14 @@
 
 </table>
 
+<h4>Cancel Order</h4>
+<div>
+    <form asp-action="DeleteCart">
+        <input type="hidden" asp-for="OrderId" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+    </form>
+</div>
+
 <div>
     <hr />
     <dl class="row">
